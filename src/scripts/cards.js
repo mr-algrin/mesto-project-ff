@@ -1,4 +1,5 @@
-const initialCards = [
+
+export const initialCards = [
     {
       name: "Архыз",
       link: "https://pictures.s3.yandex.net/frontend-developer/cards-compressed/arkhyz.jpg",
@@ -50,7 +51,7 @@ const cardsCollection = [
   }
 ];
 
-const getRandomCard = () => {
+export const getRandomCard = () => {
   const cardIndex = Math.trunc(Math.random() * cardsCollection.length);
   return cardsCollection[cardIndex];
 }
