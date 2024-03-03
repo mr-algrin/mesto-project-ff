@@ -65,5 +65,5 @@ export const deleteCardHandler = (evt) => {
 
   evt.stopPropagation();
   const parentElement = evt.target.closest(".card");
-  parentElement && parentElement.remove();
+  parentElement?.remove();
 };

@@ -28,16 +28,15 @@ export const getProfileFormData = () => {
 export const getNewCardFormData = () => {
   const card = { name: "", link: "" };
 
-  if (placeNameField) {
-    card.name = placeNameField.value;
-    placeNameField.value = "";
-  }
-
-  if (linkField) {
-    card.link = linkField.value;
-    linkField.value = "";
-  }
+  if (placeNameField) card.name = placeNameField.value;
+  if (linkField) card.link = linkField.value;
   return card;
+};
+
+export const clearNewCardFormData = () => {
+  if (placeNameField) placeNameField.value = "";
+
+  if (linkField) linkField.value = "";
 };
 
 export const setImageFormData = (data) => {

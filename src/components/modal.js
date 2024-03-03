@@ -1,7 +1,6 @@
 let activePopupElement = undefined;
 
-const getCloseButton = (element) =>
-  element ? element.querySelector(".popup__close") : null;
+const getCloseButton = (element) => element.querySelector(".popup__close");
 
 /**
  * Close button click handler
@@ -38,8 +37,7 @@ export const openModal = (element) => {
     element.addEventListener("click", overlayClickHandler);
     document.addEventListener("keydown", keyboardHandler);
     const closeButton = getCloseButton(element);
-    closeButton &&
-      closeButton.addEventListener("click", closeButtonClickHandler);
+    closeButton?.addEventListener("click", closeButtonClickHandler);
   }
 };
 
@@ -47,8 +45,9 @@ export const closeModal = (element) => {
   if (element) {
     element.classList.remove("popup_is-opened", "popup_is-animated");
     const closeButton = getCloseButton(element);
-    closeButton &&
-      closeButton.removeEventListener("click", closeButtonClickHandler);
+    closeButton?.removeEventListener("click", closeButtonClickHandler);
     document.removeEventListener("keydown", keyboardHandler);
+    element.removeEventListener("click", overlayClickHandler);
+    activePopupElement = undefined;
   }
 };

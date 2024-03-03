@@ -12,6 +12,7 @@ import {
   setProfileFormData,
   getProfileFormData,
   getNewCardFormData,
+  clearNewCardFormData,
   setImageFormData,
   profileForm,
   newCardForm,
@@ -49,6 +50,7 @@ if (newCardForm) {
   newCardForm.addEventListener("submit", (evt) => {
     evt.preventDefault();
     const cardData = getNewCardFormData();
+    clearNewCardFormData();
     const card = createCard(
       cardData,
       deleteCardHandler,
