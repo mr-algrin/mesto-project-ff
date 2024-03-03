@@ -1,56 +1,85 @@
-import './pages/index.css';
+import "./pages/index.css";
 
-import {initialCards, getRandomCard} from './scripts/cards'
+import {
+  createCard,
+  getCardData,
+  likeCardHandler,
+  deleteCardHandler,
+} from "./components/card";
+import { initialCards } from "./components/cards";
+import { closeModal, openModal } from "./components/modal";
+import {
+  setProfileFormData,
+  getProfileFormData,
+  getNewCardFormData,
+  setImageFormData,
+  profileForm,
+  newCardForm,
+} from "./components/form";
+import { getProfileData, setProfileData } from "./components/profile";
+import * as elements from "./components/element";
 
-// @todo: Темплейт карточки
-const cardTemplate = document.querySelector("#card-template").content;
-
-// @todo: DOM узлы
-const cardsListContainer = document.querySelector(".places__list");
-const addCardButton = document.querySelector(".profile__add-button");
-
-if (addCardButton !== null) {
-  addCardButton.addEventListener("click", () => {
-    const card = createCard(getRandomCard(), deleteCard);
-    card !== undefined && cardsListContainer.append(card);
+// Set up handler for opening the editing pop-up window
+if (elements.editProfileButton) {
+  elements.editProfileButton.addEventListener("click", () => {
+    const data = getProfileData();
+    setProfileFormData(data);
+    openModal(elements.editPopup);
   });
 }
 
-// @todo: Функция создания карточки
-const createCard = (cardItem, deleteCardCallback) => {
-  if (
-    typeof cardItem !== "object" ||
-    cardItem.name === undefined ||
-    cardItem.link === undefined
-  )
-    return undefined;
+// Set up handler for opening card creation pop-up
+if (elements.addCardButton !== null) {
+  elements.addCardButton.addEventListener("click", () =>
+    openModal(elements.newCardPopup)
+  );
+}
 
-  const cardElement = cardTemplate.cloneNode(true);
-  const imageElement = cardElement.querySelector(".card__image");
-  imageElement.src = cardItem.link;
-  imageElement.alt = `Изображение ${cardItem.name}`;
-  cardElement.querySelector(".card__title").textContent = cardItem.name;
-  cardElement
-    .querySelector(".card__delete-button")
-    .addEventListener("click", deleteCardCallback);
-  return cardElement;
-};
+// Set up handler for sending profile editing form
+if (profileForm) {
+  profileForm.addEventListener("submit", (evt) => {
+    evt.preventDefault();
+    const data = getProfileFormData();
+    setProfileData(data);
+    closeModal(elements.editPopup);
+  });
+}
 
-// @todo: Функция удаления карточки
-const deleteCard = (e) => {
-  if (!e.target)
-    return;
+if (newCardForm) {
+  newCardForm.addEventListener("submit", (evt) => {
+    evt.preventDefault();
+    const cardData = getNewCardFormData();
+    const card = createCard(
+      cardData,
+      deleteCardHandler,
+      likeCardHandler,
+      openCardHandler
+    );
+    elements.cardsListContainer && elements.cardsListContainer.prepend(card);
+    closeModal(elements.newCardPopup);
+  });
+}
 
-  const parentElement = e.target.closest('.card')
-  parentElement && parentElement.remove();
+const openCardHandler = (evt) => {
+  if (!evt.target) return;
+
+  evt.stopPropagation();
+  const data = getCardData(evt.target.closest(".card"));
+  setImageFormData(data);
+  openModal(elements.imagePoup);
 };
 
 // @todo: Вывести карточки на страницу
-const drawCards = () => {
+const drawDefaultCards = () => {
   initialCards.forEach((cardItem) => {
-    const card = createCard(cardItem, deleteCard);
-    card !== undefined && cardsListContainer.append(card);
+    const card = createCard(
+      cardItem,
+      deleteCardHandler,
+      likeCardHandler,
+      openCardHandler
+    );
+    card !== undefined && elements.cardsListContainer.append(card);
   });
 };
 
-drawCards();
+drawDefaultCards();
