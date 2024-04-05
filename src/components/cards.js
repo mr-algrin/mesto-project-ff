@@ -1,26 +1,17 @@
-export const initialCards = [
-  {
-    name: "Архыз",
-    link: "https://pictures.s3.yandex.net/frontend-developer/cards-compressed/arkhyz.jpg",
-  },
-  {
-    name: "Челябинская область",
-    link: "https://pictures.s3.yandex.net/frontend-developer/cards-compressed/chelyabinsk-oblast.jpg",
-  },
-  {
-    name: "Иваново",
-    link: "https://pictures.s3.yandex.net/frontend-developer/cards-compressed/ivanovo.jpg",
-  },
-  {
-    name: "Камчатка",
-    link: "https://pictures.s3.yandex.net/frontend-developer/cards-compressed/kamchatka.jpg",
-  },
-  {
-    name: "Холмогорский район",
-    link: "https://pictures.s3.yandex.net/frontend-developer/cards-compressed/kholmogorsky-rayon.jpg",
-  },
-  {
-    name: "Байкал",
-    link: "https://pictures.s3.yandex.net/frontend-developer/cards-compressed/baikal.jpg",
-  },
-];
+export const cardsCollection = [];
+
+const setCards = (newCards) => {
+  cardsCollection.splice(0, cardsCollection.length);
+  newCards.forEach(card => cardsCollection.push(card));
+}
+
+const addCard = (card) => {
+  console.log('before insert:', cardsCollection.length);
+  cardsCollection.unshift(card);
+  console.log('after insert:', cardsCollection.length);
+}
+
+export const CardsStateManager = {
+  setCards,
+  addCard,
+}

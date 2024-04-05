@@ -1,3 +1,4 @@
+export const updateAvatarForm = document.forms["update-avatar"];
 export const profileForm = document.forms["edit-profile"];
 export const newCardForm = document.forms["new-place"];
 
@@ -5,6 +6,15 @@ const profileFormName = profileForm.elements.name;
 const profileFormDescription = profileForm.elements.description;
 const placeNameField = newCardForm.elements["place-name"];
 const linkField = newCardForm.elements["link"];
+const avatarUrlField = updateAvatarForm.elements.url;
+
+export const getUpdateAvatarFormData = () => (avatarUrlField ? avatarUrlField.value : "")
+
+export const clearUpdateAvatarFormData = () => {
+  if (avatarUrlField) {
+    avatarUrlField.value = "";
+  }
+}
 
 /**
  *

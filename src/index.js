@@ -6,7 +6,6 @@ import {
   likeCardHandler,
   deleteCardHandler,
 } from "./components/card";
-import { initialCards } from "./components/cards";
 import { closeModal, openModal } from "./components/modal";
 import {
   setProfileFormData,
@@ -14,11 +13,24 @@ import {
   getNewCardFormData,
   clearNewCardFormData,
   setImageFormData,
+  getUpdateAvatarFormData,
+  clearUpdateAvatarFormData,
   profileForm,
   newCardForm,
+  updateAvatarForm,
 } from "./components/form";
-import { getProfileData, setProfileData } from "./components/profile";
+import { CardsStateManager, cardsCollection } from "./components/cards";
+import {UserStateManager, getProfileData, renderUserInfo, userInfo} from "./components/profile";
 import * as elements from "./components/element";
+
+import { Api } from "./lib/api";
+
+// Set up handler for opening the update avatar pop-up window
+if (elements.profileAvatar) {
+  elements.profileAvatar.addEventListener('click', () => {
+    openModal(elements.updateAvatarPopup);
+  })
+}
 
 // Set up handler for opening the editing pop-up window
 if (elements.editProfileButton) {
@@ -36,13 +48,36 @@ if (elements.addCardButton !== null) {
   );
 }
 
+// Set up handler for profile avatar update form
+if (updateAvatarForm) {
+  updateAvatarForm.addEventListener("submit", (evt) => {
+    evt.preventDefault();
+    const avatarUrl = getUpdateAvatarFormData();
+    clearUpdateAvatarFormData();
+    closeModal(elements.updateAvatarPopup);
+    Api.updateUserAvatar(avatarUrl)
+      .then(userInfo => {
+        UserStateManager.setUserInfo(userInfo);
+        renderUserInfo();
+      })
+      .catch(err => console.log(err))
+  })
+}
+
 // Set up handler for sending profile editing form
 if (profileForm) {
   profileForm.addEventListener("submit", (evt) => {
     evt.preventDefault();
     const data = getProfileFormData();
-    setProfileData(data);
+    // setProfileData(data);
     closeModal(elements.editPopup);
+    console.log(data);
+    Api.updateUserInfo(data.title, data.description)
+      .then(res => {
+        UserStateManager.setUserInfo(res);
+        renderUserInfo();
+      })
+      .catch(err => console.log(err))
   });
 }
 
@@ -51,14 +86,22 @@ if (newCardForm) {
     evt.preventDefault();
     const cardData = getNewCardFormData();
     clearNewCardFormData();
-    const card = createCard(
-      cardData,
-      deleteCardHandler,
-      likeCardHandler,
-      openCardHandler
-    );
-    elements.cardsListContainer && elements.cardsListContainer.prepend(card);
     closeModal(elements.newCardPopup);
+    Api.addCard(cardData.name, cardData.link)
+      .then((cardData) => {
+        CardsStateManager.addCard(cardData);
+        // TODO: in renderCards need clear all child of cardsListContainer and render new cards
+        // renderCards();
+        const card = createCard(
+          cardData,
+          userInfo._id,
+          deleteCardHandler,
+          likeCardHandler,
+          openCardHandler
+        );
+        elements.cardsListContainer && elements.cardsListContainer.prepend(card);
+      })
+      .catch(err => console.log(err));
   });
 }
 
@@ -68,20 +111,30 @@ const openCardHandler = (evt) => {
   evt.stopPropagation();
   const data = getCardData(evt.target.closest(".card"));
   setImageFormData(data);
-  openModal(elements.imagePoup);
+  openModal(elements.imagePopup);
 };
 
-// @todo: Вывести карточки на страницу
-const drawDefaultCards = () => {
-  initialCards.forEach((cardItem) => {
+export const renderCards = () => {
+  console.log('renderCards:', cardsCollection.length);
+  cardsCollection.forEach((cardItem) => {
     const card = createCard(
       cardItem,
+      userInfo._id,
       deleteCardHandler,
       likeCardHandler,
       openCardHandler
     );
     card !== undefined && elements.cardsListContainer.append(card);
   });
-};
+}
 
-drawDefaultCards();
+// Entry point
+Promise
+  .all([Api.getUserInfo(), Api.getCards()])
+  .then(responses => {
+    UserStateManager.setUserInfo(responses[0]);
+    CardsStateManager.setCards(responses[1]);
+    renderCards();
+    renderUserInfo();
+  })
+  .catch((err) => console.log(err))

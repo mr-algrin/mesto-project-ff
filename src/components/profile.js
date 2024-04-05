@@ -1,17 +1,36 @@
-import { profileTitle, profileDescription } from "./element";
+import { profileTitle, profileDescription, profileAvatar } from "./element";
 
-/**
- * Setting up a profile name and description
- * @param {*} data
- */
-export const setProfileData = (data) => {
-  const { title, description } = data;
-
-  if (title && profileTitle) profileTitle.textContent = title;
-
-  if (description && profileDescription)
-    profileDescription.textContent = description;
+export const userInfo = {
+  name: "",
+  about: "",
+  avatar: "",
+  _id: "",
+  cohort: "",
 };
+
+const setUserInfo = (info) => {
+  Object.keys(userInfo).forEach((key) => {
+    if (key in info) {
+      userInfo[key] = info[key];
+    }
+  });
+};
+
+export const UserStateManager = {
+  setUserInfo,
+};
+
+export const renderUserInfo = () => {
+  const { about, name, avatar } = userInfo;
+
+  if (name && profileTitle) profileTitle.textContent = name;
+
+  if (about && profileDescription) profileDescription.textContent = about;
+
+  if (avatar && profileAvatar)
+    profileAvatar.style["background-image"] = `url(${avatar})`;
+};
+
 
 /**
  * Extracting profile title and description
