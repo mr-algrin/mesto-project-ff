@@ -45,19 +45,19 @@ export const clearValidation = (formElement, {
   inputErrorClass,
   errorClass
 }) => {
-  const formInputsError = Array.from(formElement.querySelectorAll(`.${inputErrorClass}`))
+  const formInputs = Array.from(formElement.querySelectorAll(inputSelector))
   const submitButtonElement = formElement.querySelector(submitButtonSelector);
   submitButtonElement.classList.add(inactiveButtonClass);
-  formInputsError.forEach((errorElement) => {
-    errorElement.textContent = "";
-  })
+  formInputs.forEach((inputElement) => hideInputError(formElement, inputElement));
 }
 
 
 const hasInvalidInput = (inputList) => inputList.some(input => !input.validity.valid);
 
 const toggleButtonState = (inputList, buttonElement, validationConfig) => {
-  hasInvalidInput(inputList)
+  const isInvalid = hasInvalidInput(inputList);
+  buttonElement.disabled = isInvalid;
+  isInvalid
     ? buttonElement.classList.add(validationConfig.inactiveButtonClass)
     : buttonElement.classList.remove(validationConfig.inactiveButtonClass);
 }

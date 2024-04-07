@@ -16,7 +16,7 @@ const setUserInfo = (info) => {
   });
 };
 
-export const UserStateManager = {
+export const userStateManager = {
   setUserInfo,
 };
 

@@ -9,7 +9,7 @@ const addCard = (card) => {
   cardsCollection.unshift(card);
 }
 
-export const CardsStateManager = {
+export const cardsStateManager = {
   setCards,
   addCard,
 }

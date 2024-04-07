@@ -19,8 +19,8 @@ import {
   newCardForm,
   updateAvatarForm, changeFormButtonLabel, initialFormButtonLabel, savingFormButtonLabel,
 } from "./components/form";
-import { CardsStateManager, cardsCollection } from "./components/cards";
-import {UserStateManager, getProfileData, renderUserInfo, userInfo} from "./components/profile";
+import { cardsStateManager, cardsCollection } from "./components/cards";
+import {userStateManager, getProfileData, renderUserInfo, userInfo} from "./components/profile";
 import * as elements from "./components/element";
 import {clearValidation, enableValidation} from "./components/validation";
 
@@ -40,6 +40,7 @@ const validationConfig = {
 if (elements.profileAvatar) {
   elements.profileAvatar.addEventListener('click', () => {
     clearValidation(updateAvatarForm, validationConfig);
+    clearUpdateAvatarFormData();
     changeFormButtonLabel(updateAvatarForm, initialFormButtonLabel);
     openModal(elements.updateAvatarPopup);
   })
@@ -74,14 +75,12 @@ if (updateAvatarForm) {
     changeFormButtonLabel(updateAvatarForm, savingFormButtonLabel);
     api.updateUserAvatar(avatarUrl)
       .then(userInfo => {
-        UserStateManager.setUserInfo(userInfo);
+        userStateManager.setUserInfo(userInfo);
         renderUserInfo();
-      })
-      .catch(err => console.log(err))
-      .finally(() => {
-        clearUpdateAvatarFormData();
         closeModal(elements.updateAvatarPopup);
+        clearUpdateAvatarFormData();
       })
+      .catch(err => console.log(err));
   })
 }
 
@@ -93,11 +92,11 @@ if (profileForm) {
     changeFormButtonLabel(profileForm, savingFormButtonLabel);
     api.updateUserInfo(data.title, data.description)
       .then(res => {
-        UserStateManager.setUserInfo(res);
+        userStateManager.setUserInfo(res);
         renderUserInfo();
+        closeModal(elements.editPopup);
       })
       .catch(err => console.log(err))
-      .finally(() => closeModal(elements.editPopup));
   });
 }
 
@@ -108,7 +107,9 @@ if (newCardForm) {
     changeFormButtonLabel(newCardForm, savingFormButtonLabel);
     api.addCard(cardData.name, cardData.link)
       .then((cardData) => {
-        CardsStateManager.addCard(cardData);
+        clearNewCardFormData();
+        closeModal(elements.newCardPopup);
+        cardsStateManager.addCard(cardData);
         const card = createCard(
           cardData,
           userInfo._id,
@@ -119,10 +120,6 @@ if (newCardForm) {
         elements.cardsListContainer && elements.cardsListContainer.prepend(card);
       })
       .catch(err => console.log(err))
-      .finally(() => {
-        clearNewCardFormData();
-        closeModal(elements.newCardPopup);
-      })
   });
 }
 
@@ -152,8 +149,8 @@ export const renderCards = () => {
 Promise
   .all([api.getUserInfo(), api.getCards()])
   .then(responses => {
-    UserStateManager.setUserInfo(responses[0]);
-    CardsStateManager.setCards(responses[1]);
+    userStateManager.setUserInfo(responses[0]);
+    cardsStateManager.setCards(responses[1]);
     renderCards();
     renderUserInfo();
   })
