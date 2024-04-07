@@ -17,17 +17,30 @@ import {
   clearUpdateAvatarFormData,
   profileForm,
   newCardForm,
-  updateAvatarForm,
+  updateAvatarForm, changeFormButtonLabel, initialFormButtonLabel, savingFormButtonLabel,
 } from "./components/form";
 import { CardsStateManager, cardsCollection } from "./components/cards";
 import {UserStateManager, getProfileData, renderUserInfo, userInfo} from "./components/profile";
 import * as elements from "./components/element";
+import {clearValidation, enableValidation} from "./components/validation";
 
 import { Api } from "./lib/api";
+
+const validationConfig = {
+  formSelector: '.popup__form',
+  inputSelector: '.popup__input',
+  submitButtonSelector: '.popup__button',
+  inactiveButtonClass: 'popup__button_disabled',
+  inputErrorClass: 'popup__input_error',
+  errorClass: 'popup__error_visible'
+}
+
 
 // Set up handler for opening the update avatar pop-up window
 if (elements.profileAvatar) {
   elements.profileAvatar.addEventListener('click', () => {
+    clearValidation(updateAvatarForm, validationConfig);
+    changeFormButtonLabel(updateAvatarForm, initialFormButtonLabel);
     openModal(elements.updateAvatarPopup);
   })
 }
@@ -37,15 +50,20 @@ if (elements.editProfileButton) {
   elements.editProfileButton.addEventListener("click", () => {
     const data = getProfileData();
     setProfileFormData(data);
+    clearValidation(profileForm, validationConfig);
+    changeFormButtonLabel(profileForm, initialFormButtonLabel);
     openModal(elements.editPopup);
   });
 }
 
 // Set up handler for opening card creation pop-up
 if (elements.addCardButton !== null) {
-  elements.addCardButton.addEventListener("click", () =>
-    openModal(elements.newCardPopup)
-  );
+  elements.addCardButton.addEventListener("click", () =>{
+    clearNewCardFormData();
+    clearValidation(newCardForm, validationConfig);
+    changeFormButtonLabel(newCardForm, initialFormButtonLabel);
+    openModal(elements.newCardPopup);
+  });
 }
 
 // Set up handler for profile avatar update form
@@ -53,14 +71,17 @@ if (updateAvatarForm) {
   updateAvatarForm.addEventListener("submit", (evt) => {
     evt.preventDefault();
     const avatarUrl = getUpdateAvatarFormData();
-    clearUpdateAvatarFormData();
-    closeModal(elements.updateAvatarPopup);
+    changeFormButtonLabel(updateAvatarForm, savingFormButtonLabel);
     Api.updateUserAvatar(avatarUrl)
       .then(userInfo => {
         UserStateManager.setUserInfo(userInfo);
         renderUserInfo();
       })
       .catch(err => console.log(err))
+      .finally(() => {
+        clearUpdateAvatarFormData();
+        closeModal(elements.updateAvatarPopup);
+      })
   })
 }
 
@@ -69,15 +90,14 @@ if (profileForm) {
   profileForm.addEventListener("submit", (evt) => {
     evt.preventDefault();
     const data = getProfileFormData();
-    // setProfileData(data);
-    closeModal(elements.editPopup);
-    console.log(data);
+    changeFormButtonLabel(profileForm, savingFormButtonLabel);
     Api.updateUserInfo(data.title, data.description)
       .then(res => {
         UserStateManager.setUserInfo(res);
         renderUserInfo();
       })
       .catch(err => console.log(err))
+      .finally(() => closeModal(elements.editPopup));
   });
 }
 
@@ -85,13 +105,10 @@ if (newCardForm) {
   newCardForm.addEventListener("submit", (evt) => {
     evt.preventDefault();
     const cardData = getNewCardFormData();
-    clearNewCardFormData();
-    closeModal(elements.newCardPopup);
+    changeFormButtonLabel(newCardForm, savingFormButtonLabel);
     Api.addCard(cardData.name, cardData.link)
       .then((cardData) => {
         CardsStateManager.addCard(cardData);
-        // TODO: in renderCards need clear all child of cardsListContainer and render new cards
-        // renderCards();
         const card = createCard(
           cardData,
           userInfo._id,
@@ -101,7 +118,11 @@ if (newCardForm) {
         );
         elements.cardsListContainer && elements.cardsListContainer.prepend(card);
       })
-      .catch(err => console.log(err));
+      .catch(err => console.log(err))
+      .finally(() => {
+        clearNewCardFormData();
+        closeModal(elements.newCardPopup);
+      })
   });
 }
 
@@ -115,7 +136,6 @@ const openCardHandler = (evt) => {
 };
 
 export const renderCards = () => {
-  console.log('renderCards:', cardsCollection.length);
   cardsCollection.forEach((cardItem) => {
     const card = createCard(
       cardItem,
@@ -138,3 +158,6 @@ Promise
     renderUserInfo();
   })
   .catch((err) => console.log(err))
+
+
+enableValidation(validationConfig);

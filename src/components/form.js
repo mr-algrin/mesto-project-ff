@@ -8,6 +8,15 @@ const placeNameField = newCardForm.elements["place-name"];
 const linkField = newCardForm.elements["link"];
 const avatarUrlField = updateAvatarForm.elements.url;
 
+export const initialFormButtonLabel = "Сохранить";
+export const savingFormButtonLabel = "Сохранение..."
+
+export const changeFormButtonLabel = (formElement, label) => {
+  const elementButton = formElement.querySelector('.popup__button')
+  if (elementButton !== null)
+    elementButton.textContent = label;
+}
+
 export const getUpdateAvatarFormData = () => (avatarUrlField ? avatarUrlField.value : "")
 
 export const clearUpdateAvatarFormData = () => {
