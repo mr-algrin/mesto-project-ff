@@ -24,7 +24,7 @@ import {UserStateManager, getProfileData, renderUserInfo, userInfo} from "./comp
 import * as elements from "./components/element";
 import {clearValidation, enableValidation} from "./components/validation";
 
-import { Api } from "./lib/api";
+import { api } from "./lib/api";
 
 const validationConfig = {
   formSelector: '.popup__form',
@@ -72,7 +72,7 @@ if (updateAvatarForm) {
     evt.preventDefault();
     const avatarUrl = getUpdateAvatarFormData();
     changeFormButtonLabel(updateAvatarForm, savingFormButtonLabel);
-    Api.updateUserAvatar(avatarUrl)
+    api.updateUserAvatar(avatarUrl)
       .then(userInfo => {
         UserStateManager.setUserInfo(userInfo);
         renderUserInfo();
@@ -91,7 +91,7 @@ if (profileForm) {
     evt.preventDefault();
     const data = getProfileFormData();
     changeFormButtonLabel(profileForm, savingFormButtonLabel);
-    Api.updateUserInfo(data.title, data.description)
+    api.updateUserInfo(data.title, data.description)
       .then(res => {
         UserStateManager.setUserInfo(res);
         renderUserInfo();
@@ -106,7 +106,7 @@ if (newCardForm) {
     evt.preventDefault();
     const cardData = getNewCardFormData();
     changeFormButtonLabel(newCardForm, savingFormButtonLabel);
-    Api.addCard(cardData.name, cardData.link)
+    api.addCard(cardData.name, cardData.link)
       .then((cardData) => {
         CardsStateManager.addCard(cardData);
         const card = createCard(
@@ -150,7 +150,7 @@ export const renderCards = () => {
 
 // Entry point
 Promise
-  .all([Api.getUserInfo(), Api.getCards()])
+  .all([api.getUserInfo(), api.getCards()])
   .then(responses => {
     UserStateManager.setUserInfo(responses[0]);
     CardsStateManager.setCards(responses[1]);

@@ -1,5 +1,5 @@
 import { cardTemplateElement } from "./element";
-import {Api} from "../lib/api";
+import {api} from "../lib/api";
 
 const cardTemplate = cardTemplateElement.content;
 
@@ -85,7 +85,7 @@ export const likeCardHandler = (evt) => {
   const cardId = getCardElementId(cardElement);
   const isLiked = evt.target.classList.contains('card__like-button_is-active');
   if (isLiked) {
-    Api.dislikeCard(cardId)
+    api.dislikeCard(cardId)
       .then(res => {
         updateLikesCount(cardElement, res.likes.length);
         evt.target.classList.toggle("card__like-button_is-active");
@@ -93,7 +93,7 @@ export const likeCardHandler = (evt) => {
       .catch(err => console.log(err))
   }
   else {
-    Api.likeCard(cardId)
+    api.likeCard(cardId)
       .then(res => {
         updateLikesCount(cardElement, res.likes.length);
         evt.target.classList.toggle("card__like-button_is-active");
@@ -110,7 +110,7 @@ export const deleteCardHandler = (evt) => {
   const parentElement = evt.target.closest(".card");
   const cardId = getCardElementId(parentElement);
   if (cardId) {
-    Api.deleteCard(cardId)
+    api.deleteCard(cardId)
       .then(() => {
         parentElement?.remove();
       })
