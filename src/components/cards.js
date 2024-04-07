@@ -6,9 +6,7 @@ const setCards = (newCards) => {
 }
 
 const addCard = (card) => {
-  console.log('before insert:', cardsCollection.length);
   cardsCollection.unshift(card);
-  console.log('after insert:', cardsCollection.length);
 }
 
 export const CardsStateManager = {
